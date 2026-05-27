@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时光信箱 - 那些未曾说出口的话</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8b6f47;
+            --primary-light: #c4a882;
+            --bg: #faf8f5;
+            --text: #4a4a4a;
+            --text-light: #8a8a8a;
+            --border: #e8e0d5;
+            --shadow: rgba(139, 111, 71, 0.08);
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* 导航 */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(250, 248, 245, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* 首屏 */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, #faf8f5 0%, #f0ebe3 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c4a882' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            letter-spacing: 0.2em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            animation: bounce 2s infinite;
+            color: var(--primary-light);
+            font-size: 0.9rem;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* 轮播区域 */
+        .carousel-section {
+            padding: 5rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px var(--shadow);
+            background: #fff;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f0e8;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .carousel-slide:hover img {
+            transform: scale(1.05);
+        }
+
+        .slide-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+            color: white;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .carousel-slide:hover .slide-caption {
+            opacity: 1;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--primary);
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .carousel-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-prev { left: 1rem; }
+        .carousel-next { right: 1rem; }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: white;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* 日志区域 */
+        .journal-section {
+            padding: 5rem 2rem;
+            background: #fff;
+        }
+
+        .journal-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .journal-form {
+            background: var(--bg);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.95rem;
+            background: white;
+            transition: border-color 0.3s;
+            color: var(--text);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .journal-entries {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .journal-entry {
+            background: var(--bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 3px solid var(--primary-light);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .journal-entry::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(196, 168, 130, 0.03) 100%);
+            pointer-events: none;
+        }
+
+        .journal-entry:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .entry-date {
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .entry-title {
+            font-size: 1.2rem;
+            color: var(--text);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .entry-content {
+            color: var(--text-light);
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .entry-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .entry-actions button {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: color 0.3s;
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        .entry-actions button:hover {
+            color: var(--primary);
+        }
+
+        /* 留言板 */
+        .guestbook-section {
+            padding: 5rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .guestbook-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .guestbook-entries {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .guestbook-entry {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px var(--shadow);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .guestbook-entry:hover {
+            transform: translateY(-2px);
+        }
+
+        .guestbook-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .guest-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .guest-time {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .guest-message {
+            color: var(--text);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .guestbook-entry:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            color: #c44;
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+
+        footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        .heart {
+            color: #c44;
+            display: inline-block;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .carousel-container { height: 300px; }
+            .nav-links { gap: 1rem; font-size: 0.85rem; }
+            .journal-form, .guestbook-form { padding: 1.5rem; }
+        }
+
+        /* 淡入动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">时光信箱</a>
+            <ul class="nav-links">
+                <li><a href="#carousel">回忆相册</a></li>
+                <li><a href="#journal">心事日志</a></li>
+                <li><a href="#guestbook">留言墙</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>那些未曾说出口的话</h1>
+            <p class="hero-subtitle">有些话，当时没说出口，后来就成了遗憾<br>有些回忆，放在这里，让时光慢慢沉淀</p>
+        </div>
+        <div class="scroll-hint">
+            <span>向下滚动 ↓</span>
+        </div>
+    </section>
+
+    <section id="carousel" class="carousel-section">
+        <div class="section-title fade-in">
+            <h2>回忆相册</h2>
+            <p>点击上传图片，让记忆在这里停留</p>
+        </div>
+
+        <div class="carousel-container fade-in">
+            <div class="carousel-track" id="carouselTrack">
+                <div class="carousel-slide">
+                    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(135deg, #f5f0e8, #e8dfd0);color:var(--primary);">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1rem;opacity:0.5;">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        <p style="font-size:1.1rem;">点击添加照片</p>
+                        <p style="font-size:0.85rem;opacity:0.6;margin-top:0.5rem;">支持 JPG、PNG 格式</p>
+                        <input type="file" accept="image/*" multiple id="imageInput" style="position:absolute;width:100%;height:100%;opacity:0;cursor:pointer;">
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-btn carousel-prev" id="prevBtn">‹</button>
+            <button class="carousel-btn carousel-next" id="nextBtn">›</button>
+            <div class="carousel-dots" id="dotsContainer"></div>
+        </div>
+    </section>
+
+    <section id="journal" class="journal-section">
+        <div class="journal-container">
+            <div class="section-title fade-in">
+                <h2>心事日志</h2>
+                <p>写下那些想说却没来得及说的话</p>
+            </div>
+
+            <div class="journal-form fade-in">
+                <div class="form-group">
+                    <label>日期</label>
+                    <input type="date" id="journalDate" required>
+                </div>
+                <div class="form-group">
+                    <label>标题</label>
+                    <input type="text" id="journalTitle" placeholder="给这段回忆起个名字..." required>
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <textarea id="journalContent" placeholder="今天想对她说..." required></textarea>
+                </div>
+                <button class="btn-submit" onclick="addJournal()">
+                    <span>✎</span> 记录心事
+                </button>
+            </div>
+
+            <div class="journal-entries" id="journalEntries">
+                <div class="journal-entry fade-in">
+                    <div class="entry-date">2024年3月15日</div>
+                    <div class="entry-title">那个下雨天</div>
+                    <div class="entry-content">
+                        今天下雨了，想起你以前总说喜欢听雨声。那时候我们挤在一把伞下，你说伞太小了，我说那就靠紧一点。现在伞还在，只是一个人撑的时候，总觉得伞太大了。
+                    </div>
+                    <div class="entry-actions">
+                        <button onclick="deleteJournal(this)">删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="guestbook" class="guestbook-section">
+        <div class="section-title fade-in">
+            <h2>留言墙</h2>
+            <p>如果你也有想说的话，可以留在这里</p>
+        </div>
+
+        <div class="guestbook-form fade-in">
+            <div class="form-group">
+                <label>你的名字</label>
+                <input type="text" id="guestName" placeholder="怎么称呼你？" required>
+            </div>
+            <div class="form-group">
+                <label>留言内容</label>
+                <textarea id="guestMessage" placeholder="写下你想说的话..." required></textarea>
+            </div>
+            <button class="btn-submit" onclick="addGuestbook()">
+                <span>✉</span> 留下足迹
+            </button>
+        </div>
+
+        <div class="guestbook-entries" id="guestbookEntries">
+            <div class="guestbook-entry fade-in">
+                <button class="delete-btn" onclick="deleteGuestbook(this)">×</button>
+                <div class="guestbook-header">
+                    <span class="guest-name">过客</span>
+                    <span class="guest-time">2024-03-10</span>
+                </div>
+                <div class="guest-message">
+                    有些告别，当时以为是暂时的，后来才发现是永远的。愿她一切安好。
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>时光信箱 <span class="heart">❤</span> 珍藏每一份回忆</p>
+        <p style="font-size:0.8rem;opacity:0.6;">数据保存在本地浏览器中，刷新页面不会丢失</p>
+    </footer>
+
+    <script>
+        // 轮播功能
+        let currentSlide = 0;
+        let slides = [];
+        const track = document.getElementById('carouselTrack');
+        const dotsContainer = document.getElementById('dotsContainer');
+        const imageInput = document.getElementById('imageInput');
+
+        function updateCarousel() {
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        function createSlide(src, caption = '') {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+            slide.innerHTML = `
+                <img src="${src}" alt="回忆">
+                <div class="slide-caption">${caption || '珍贵的回忆'}</div>
+            `;
+            return slide;
+        }
+
+        function createDot(index) {
+            const dot = document.createElement('button');
+            dot.className = 'dot' + (index === 0 ? ' active' : '');
+            dot.onclick = () => {
+                currentSlide = index;
+                updateCarousel();
+            };
+            return dot;
+        }
+
+        // 图片上传
+        imageInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const slide = createSlide(event.target.result);
+                    // 插入到第一个位置（保持上传按钮在最后）
+                    const uploadSlide = track.firstElementChild;
+                    track.insertBefore(slide, uploadSlide);
+
+                    // 更新dots
+                    dotsContainer.innerHTML = '';
+                    const totalSlides = track.children.length;
+                    for (let i = 0; i < totalSlides; i++) {
+                        dotsContainer.appendChild(createDot(i));
+                    }
+
+                    // 保存到localStorage
+                    saveImages();
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        document.getElementById('prevBtn').onclick = () => {
+            currentSlide = (currentSlide - 1 + track.children.length) % track.children.length;
+            updateCarousel();
+        };
+
+        document.getElementById('nextBtn').onclick = () => {
+            currentSlide = (currentSlide + 1) % track.children.length;
+            updateCarousel();
+        };
+
+        // 自动播放
+        let autoPlay = setInterval(() => {
+            currentSlide = (currentSlide + 1) % track.children.length;
+            updateCarousel();
+        }, 5000);
+
+        document.querySelector('.carousel-container').addEventListener('mouseenter', () => clearInterval(autoPlay));
+        document.querySelector('.carousel-container').addEventListener('mouseleave', () => {
+            autoPlay = setInterval(() => {
+                currentSlide = (currentSlide + 1) % track.children.length;
+                updateCarousel();
+            }, 5000);
+        });
+
+        // 日志功能
+        function addJournal() {
+            const date = document.getElementById('journalDate').value;
+            const title = document.getElementById('journalTitle').value;
+            const content = document.getElementById('journalContent').value;
+
+            if (!date || !title || !content) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            const entry = document.createElement('div');
+            entry.className = 'journal-entry fade-in';
+            entry.innerHTML = `
+                <div class="entry-date">${formatDate(date)}</div>
+                <div class="entry-title">${escapeHtml(title)}</div>
+                <div class="entry-content">${escapeHtml(content)}</div>
+                <div class="entry-actions">
+                    <button onclick="deleteJournal(this)">删除</button>
+                </div>
+            `;
+
+            document.getElementById('journalEntries').prepend(entry);
+
+            // 清空表单
+            document.getElementById('journalDate').value = '';
+            document.getElementById('journalTitle').value = '';
+            document.getElementById('journalContent').value = '';
+
+            // 触发动画
+            setTimeout(() => entry.classList.add('visible'), 10);
+            saveJournals();
+        }
+
+        function deleteJournal(btn) {
+            if (confirm('确定要删除这条日志吗？')) {
+                btn.closest('.journal-entry').remove();
+                saveJournals();
+            }
+        }
+
+        // 留言板功能
+        function addGuestbook() {
+            const name = document.getElementById('guestName').value;
+            const message = document.getElementById('guestMessage').value;
+
+            if (!name || !message) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            const entry = document.createElement('div');
+            entry.className = 'guestbook-entry fade-in';
+            entry.innerHTML = `
+                <button class="delete-btn" onclick="deleteGuestbook(this)">×</button>
+                <div class="guestbook-header">
+                    <span class="guest-name">${escapeHtml(name)}</span>
+                    <span class="guest-time">${new Date().toLocaleDateString()}</span>
+                </div>
+                <div class="guest-message">${escapeHtml(message)}</div>
+            `;
+
+            document.getElementById('guestbookEntries').prepend(entry);
+
+            document.getElementById('guestName').value = '';
+            document.getElementById('guestMessage').value = '';
+
+            setTimeout(() => entry.classList.add('visible'), 10);
+            saveGuestbooks();
+        }
+
+        function deleteGuestbook(btn) {
+            if (confirm('确定要删除这条留言吗？')) {
+                btn.closest('.guestbook-entry').remove();
+                saveGuestbooks();
+            }
+        }
+
+        // 工具函数
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 本地存储
+        function saveImages() {
+            const images = [];
+            track.querySelectorAll('.carousel-slide img').forEach(img => {
+                if (img.src.startsWith('data:')) {
+                    images.push(img.src);
+                }
+            });
+            localStorage.setItem('memorial_images', JSON.stringify(images));
+        }
+
+        function loadImages() {
+            const saved = localStorage.getItem('memorial_images');
+            if (saved) {
+                const images = JSON.parse(saved);
+                const uploadSlide = track.firstElementChild;
+                images.forEach(src => {
+                    const slide = createSlide(src);
+                    track.insertBefore(slide, uploadSlide);
+                });
+
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i < track.children.length; i++) {
+                    dotsContainer.appendChild(createDot(i));
+                }
+            }
+        }
+
+        function saveJournals() {
+            const journals = [];
+            document.querySelectorAll('.journal-entry').forEach(entry => {
+                journals.push({
+                    date: entry.querySelector('.entry-date').textContent,
+                    title: entry.querySelector('.entry-title').textContent,
+                    content: entry.querySelector('.entry-content').textContent
+                });
+            });
+            localStorage.setItem('memorial_journals', JSON.stringify(journals));
+        }
+
+        function loadJournals() {
+            const saved = localStorage.getItem('memorial_journals');
+            if (saved) {
+                document.getElementById('journalEntries').innerHTML = '';
+                const journals = JSON.parse(saved);
+                journals.forEach(j => {
+                    const entry = document.createElement('div');
+                    entry.className = 'journal-entry fade-in visible';
+                    entry.innerHTML = `
+                        <div class="entry-date">${j.date}</div>
+                        <div class="entry-title">${j.title}</div>
+                        <div class="entry-content">${j.content}</div>
+                        <div class="entry-actions">
+                            <button onclick="deleteJournal(this)">删除</button>
+                        </div>
+                    `;
+                    document.getElementById('journalEntries').appendChild(entry);
+                });
+            }
+        }
+
+        function saveGuestbooks() {
+            const books = [];
+            document.querySelectorAll('.guestbook-entry').forEach(entry => {
+                books.push({
+                    name: entry.querySelector('.guest-name').textContent,
+                    time: entry.querySelector('.guest-time').textContent,
+                    message: entry.querySelector('.guest-message').textContent
+                });
+            });
+            localStorage.setItem('memorial_guestbooks', JSON.stringify(books));
+        }
+
+        function loadGuestbooks() {
+            const saved = localStorage.getItem('memorial_guestbooks');
+            if (saved) {
+                document.getElementById('guestbookEntries').innerHTML = '';
+                const books = JSON.parse(saved);
+                books.forEach(b => {
+                    const entry = document.createElement('div');
+                    entry.className = 'guestbook-entry fade-in visible';
+                    entry.innerHTML = `
+                        <button class="delete-btn" onclick="deleteGuestbook(this)">×</button>
+                        <div class="guestbook-header">
+                            <span class="guest-name">${b.name}</span>
+                            <span class="guest-time">${b.time}</span>
+                        </div>
+                        <div class="guest-message">${b.message}</div>
+                    `;
+                    document.getElementById('guestbookEntries').appendChild(entry);
+                });
+            }
+        }
+
+        // 滚动动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // 初始化日期为今天
+        document.getElementById('journalDate').valueAsDate = new Date();
+
+        // 加载保存的数据
+        loadImages();
+        loadJournals();
+        loadGuestbooks();
+
+        // 初始化dots
+        if (dotsContainer.children.length === 0) {
+            dotsContainer.appendChild(createDot(0));
+        }
+    </script>
+</body>
+</html>
